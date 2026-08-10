@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { Loader2 } from "lucide-react"
+import { Filter, Loader2, RotateCcw } from "lucide-react"
 
 import { listPredictions } from "@/api/client"
 import { Badge } from "@/components/ui/badge"
@@ -74,21 +74,37 @@ export function HistoryPage() {
     }
   }
 
-  return (
-    <div className="mx-auto flex max-w-5xl flex-col gap-6 py-8">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Prediction history</h1>
-        <p className="text-sm text-muted-foreground">
-          Audit trail of every screening prediction and its clinician disposition.
-        </p>
-      </div>
+  const hasFilters = dateFrom || dateTo || result !== "all" || status !== "all"
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Filters</CardTitle>
+  return (
+    <div className="flex flex-col gap-6 py-8">
+      <section className="reveal-up rounded-md border bg-card/88 p-5 panel-shadow">
+        <div className="font-mono-clinical text-xs uppercase tracking-[0.18em] text-primary">
+          Audit console
+        </div>
+        <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <h1 className="text-3xl font-semibold tracking-tight">Prediction history</h1>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
+              Review every screening prediction, model confidence, and clinician disposition.
+            </p>
+          </div>
+          <div className="rounded-md border bg-secondary/60 px-3 py-2 text-sm">
+            <span className="font-mono-clinical font-semibold">{total}</span>
+            <span className="ml-2 text-muted-foreground">records</span>
+          </div>
+        </div>
+      </section>
+
+      <Card className="reveal-up" style={{ animationDelay: "80ms" }}>
+        <CardHeader className="pb-2">
+          <CardTitle className="flex items-center gap-2">
+            <Filter className="size-4 text-primary" />
+            Filters
+          </CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="flex flex-wrap items-end gap-4">
+        <CardContent className="pb-6">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-[1fr_1fr_11rem_12rem_auto] lg:items-end">
             <div className="grid gap-1.5">
               <Label htmlFor="date-from">From</Label>
               <Input
@@ -110,7 +126,7 @@ export function HistoryPage() {
             <div className="grid gap-1.5">
               <Label>Result</Label>
               <Select value={result} onValueChange={resetPageAnd((v) => setResult(v as Verdict | "all"))}>
-                <SelectTrigger className="w-40">
+                <SelectTrigger className="w-full">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -126,7 +142,7 @@ export function HistoryPage() {
                 value={status}
                 onValueChange={resetPageAnd((v) => setStatus(v as typeof status))}
               >
-                <SelectTrigger className="w-44">
+                <SelectTrigger className="w-full">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -136,9 +152,9 @@ export function HistoryPage() {
                 </SelectContent>
               </Select>
             </div>
-            {(dateFrom || dateTo || result !== "all" || status !== "all") && (
+            {hasFilters && (
               <Button
-                variant="ghost"
+                variant="outline"
                 onClick={() => {
                   setDateFrom("")
                   setDateTo("")
@@ -147,24 +163,25 @@ export function HistoryPage() {
                   setOffset(0)
                 }}
               >
-                Clear filters
+                <RotateCcw className="size-4" />
+                Clear
               </Button>
             )}
           </div>
         </CardContent>
       </Card>
 
-      <Card>
-        <CardContent className="pt-6">
+      <Card className="reveal-up" style={{ animationDelay: "130ms" }}>
+        <CardContent className="py-6">
           {loading ? (
-            <div className="flex items-center gap-2 py-8 justify-center text-sm text-muted-foreground">
-              <Loader2 className="size-4 animate-spin" />
-              Loading…
+            <div className="flex items-center justify-center gap-2 py-10 text-sm text-muted-foreground">
+              <Loader2 className="size-4 animate-spin text-primary" />
+              Loading...
             </div>
           ) : error ? (
-            <div className="py-8 text-center text-sm text-destructive">{error}</div>
+            <div className="py-10 text-center text-sm text-destructive">{error}</div>
           ) : items.length === 0 ? (
-            <div className="py-8 text-center text-sm text-muted-foreground">
+            <div className="py-10 text-center text-sm text-muted-foreground">
               No predictions match these filters.
             </div>
           ) : (
@@ -183,16 +200,20 @@ export function HistoryPage() {
                 <TableBody>
                   {items.map((item) => (
                     <TableRow key={item.id}>
-                      <TableCell className="text-muted-foreground">
+                      <TableCell className="font-mono-clinical text-xs text-muted-foreground">
                         {new Date(item.created_at).toLocaleString()}
                       </TableCell>
-                      <TableCell>{item.original_filename}</TableCell>
+                      <TableCell className="max-w-72 truncate font-medium">
+                        {item.original_filename}
+                      </TableCell>
                       <TableCell>
                         <Badge variant={item.model_prediction === "Pneumonia" ? "pneumonia" : "normal"}>
                           {item.model_prediction}
                         </Badge>
                       </TableCell>
-                      <TableCell>{(item.confidence * 100).toFixed(1)}%</TableCell>
+                      <TableCell className="font-mono-clinical">
+                        {(item.confidence * 100).toFixed(1)}%
+                      </TableCell>
                       <TableCell>
                         {item.clinician_decision ? (
                           <span
@@ -206,7 +227,7 @@ export function HistoryPage() {
                             {item.clinician_decision !== item.model_prediction && " (override)"}
                           </span>
                         ) : (
-                          <span className="text-muted-foreground">—</span>
+                          <span className="text-muted-foreground">Not recorded</span>
                         )}
                       </TableCell>
                       <TableCell>
@@ -219,9 +240,9 @@ export function HistoryPage() {
                 </TableBody>
               </Table>
 
-              <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
+              <div className="mt-4 flex flex-col gap-3 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  Showing {offset + 1}–{Math.min(offset + PAGE_SIZE, total)} of {total}
+                  Showing {offset + 1}-{Math.min(offset + PAGE_SIZE, total)} of {total}
                 </div>
                 <div className="flex gap-2">
                   <Button

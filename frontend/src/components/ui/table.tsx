@@ -4,10 +4,10 @@ import { cn } from "@/lib/utils"
 
 function Table({ className, ...props }: React.ComponentProps<"table">) {
   return (
-    <div data-slot="table-container" className="relative w-full overflow-x-auto">
+    <div data-slot="table-container" className="relative w-full overflow-x-auto rounded-md border">
       <table
         data-slot="table"
-        className={cn("w-full caption-bottom text-sm", className)}
+        className={cn("w-full caption-bottom bg-card text-sm", className)}
         {...props}
       />
     </div>
@@ -18,7 +18,7 @@ function TableHeader({ className, ...props }: React.ComponentProps<"thead">) {
   return (
     <thead
       data-slot="table-header"
-      className={cn("[&_tr]:border-b", className)}
+      className={cn("bg-secondary/65 [&_tr]:border-b", className)}
       {...props}
     />
   )
@@ -39,7 +39,7 @@ function TableRow({ className, ...props }: React.ComponentProps<"tr">) {
     <tr
       data-slot="table-row"
       className={cn(
-        "hover:bg-muted/50 data-[state=selected]:bg-muted border-b transition-colors",
+        "hover:bg-secondary/45 data-[state=selected]:bg-muted border-b transition-colors",
         className
       )}
       {...props}
@@ -52,7 +52,7 @@ function TableHead({ className, ...props }: React.ComponentProps<"th">) {
     <th
       data-slot="table-head"
       className={cn(
-        "text-muted-foreground h-10 px-3 text-left align-middle font-medium whitespace-nowrap",
+        "text-muted-foreground h-10 px-3 text-left align-middle text-xs font-semibold uppercase tracking-[0.11em] whitespace-nowrap",
         className
       )}
       {...props}

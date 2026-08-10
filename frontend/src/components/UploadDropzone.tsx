@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from "react"
-import { Loader2, Upload } from "lucide-react"
+import { FileImage, Loader2, Upload } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -35,8 +35,8 @@ export function UploadDropzone({ onFileSelected, submitting }: UploadDropzonePro
     <div className="flex flex-col gap-3">
       <div
         className={cn(
-          "flex flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed p-10 text-center transition-colors",
-          isDragging ? "border-primary bg-accent" : "border-input",
+          "surface-grid flex min-h-80 flex-col items-center justify-center gap-4 rounded-md border-2 border-dashed p-6 text-center transition-all sm:p-10",
+          isDragging ? "border-primary bg-accent/45 shadow-inner" : "border-input bg-secondary/35",
           submitting && "pointer-events-none opacity-60"
         )}
         onDragOver={(e) => {
@@ -51,17 +51,29 @@ export function UploadDropzone({ onFileSelected, submitting }: UploadDropzonePro
         }}
       >
         {previewUrl ? (
-          <img
-            src={previewUrl}
-            alt="Chest X-ray preview"
-            className="max-h-64 rounded-md border object-contain"
-          />
+          <div className="flex w-full flex-col items-center gap-3">
+            <div className="rounded-md border bg-foreground p-2 shadow-sm">
+              <img
+                src={previewUrl}
+                alt="Chest X-ray preview"
+                className="max-h-72 rounded-sm object-contain"
+              />
+            </div>
+            <div className="font-mono-clinical text-xs uppercase tracking-[0.16em] text-muted-foreground">
+              Image staged for inference
+            </div>
+          </div>
         ) : (
-          <Upload className="size-8 text-muted-foreground" />
+          <div className="flex size-14 items-center justify-center rounded-md border bg-card text-primary shadow-sm">
+            <FileImage className="size-7" />
+          </div>
         )}
 
-        <div className="text-sm text-muted-foreground">
-          Drag and drop a chest X-ray image, or
+        <div className="max-w-sm">
+          <div className="font-medium">Drop chest X-ray image for screening</div>
+          <div className="mt-1 text-sm text-muted-foreground">
+            Use a de-identified pediatric frontal chest radiograph when possible.
+          </div>
         </div>
 
         <input
@@ -78,9 +90,9 @@ export function UploadDropzone({ onFileSelected, submitting }: UploadDropzonePro
           disabled={submitting}
         >
           {submitting ? <Loader2 className="size-4 animate-spin" /> : <Upload className="size-4" />}
-          {submitting ? "Analyzing…" : "Choose image"}
+          {submitting ? "Analyzing..." : "Choose image"}
         </Button>
-        <div className="text-xs text-muted-foreground">JPEG or PNG, up to 10 MB</div>
+        <div className="font-mono-clinical text-xs text-muted-foreground">JPEG / PNG / max 10 MB</div>
       </div>
       {error && <div className="text-sm text-destructive">{error}</div>}
     </div>

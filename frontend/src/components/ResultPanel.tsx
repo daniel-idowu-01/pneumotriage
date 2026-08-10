@@ -15,7 +15,7 @@ import type { PredictionRecord, PredictionResponse, Verdict } from "@/types/pred
 
 function VerdictBadge({ verdict }: { verdict: Verdict }) {
   return (
-    <Badge variant={verdict === "Pneumonia" ? "pneumonia" : "normal"} className="text-sm px-3 py-1">
+    <Badge variant={verdict === "Pneumonia" ? "pneumonia" : "normal"} className="px-3 py-1 text-sm">
       {verdict}
     </Badge>
   )
@@ -56,22 +56,33 @@ export function ResultPanel({ result, onConfirmed }: ResultPanelProps) {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Model result</CardTitle>
-      </CardHeader>
-      <CardContent className="flex flex-col gap-5">
-        <div className="flex flex-wrap items-center gap-4">
+    <Card className="reveal-up overflow-hidden" style={{ animationDelay: "110ms" }}>
+      <CardHeader className="border-b bg-secondary/45 pb-5">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <div className="font-mono-clinical text-xs uppercase tracking-[0.16em] text-primary">
+              Inference complete
+            </div>
+            <CardTitle className="mt-2">Model result</CardTitle>
+          </div>
           <VerdictBadge verdict={result.prediction} />
-          <div className="text-sm text-muted-foreground">
-            Confidence <span className="font-medium text-foreground">{confidencePct}%</span>
+        </div>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-5 py-6">
+        <div className="grid gap-3 sm:grid-cols-3">
+          <div className="rounded-md border bg-card p-4">
+            <div className="text-xs uppercase tracking-[0.12em] text-muted-foreground">Confidence</div>
+            <div className="font-mono-clinical mt-2 text-2xl font-semibold">{confidencePct}%</div>
           </div>
-          <div className="text-sm text-muted-foreground">
-            Raw score (P(Normal)){" "}
-            <span className="font-medium text-foreground">{result.raw_score.toFixed(4)}</span>
+          <div className="rounded-md border bg-card p-4">
+            <div className="text-xs uppercase tracking-[0.12em] text-muted-foreground">P(Normal)</div>
+            <div className="font-mono-clinical mt-2 text-2xl font-semibold">
+              {result.raw_score.toFixed(4)}
+            </div>
           </div>
-          <div className="text-sm text-muted-foreground">
-            Threshold <span className="font-medium text-foreground">{result.threshold_used}</span>
+          <div className="rounded-md border bg-card p-4">
+            <div className="text-xs uppercase tracking-[0.12em] text-muted-foreground">Threshold</div>
+            <div className="font-mono-clinical mt-2 text-2xl font-semibold">{result.threshold_used}</div>
           </div>
         </div>
 
@@ -88,10 +99,10 @@ export function ResultPanel({ result, onConfirmed }: ResultPanelProps) {
             <div className="text-sm">
               <span className="font-medium">{confirmed.clinician_decision}</span>
               {confirmed.clinician_decision !== confirmed.model_prediction && (
-                <span className="text-muted-foreground"> — overrides model prediction</span>
+                <span className="text-muted-foreground"> overrides model prediction</span>
               )}
               {confirmed.clinician_name && (
-                <span className="text-muted-foreground"> · by {confirmed.clinician_name}</span>
+                <span className="text-muted-foreground"> by {confirmed.clinician_name}</span>
               )}
             </div>
             {confirmed.clinician_notes && (
@@ -104,11 +115,11 @@ export function ResultPanel({ result, onConfirmed }: ResultPanelProps) {
               <div className="mb-2 text-sm font-medium">
                 Clinician final decision <span className="text-destructive">(required)</span>
               </div>
-              <div className="flex gap-2">
+              <div className="grid gap-2 sm:grid-cols-2">
                 <Button
                   type="button"
                   variant={selectedVerdict === "Pneumonia" ? "default" : "outline"}
-                  className={cn(selectedVerdict === "Pneumonia" && "ring-2 ring-ring")}
+                  className={cn("justify-start", selectedVerdict === "Pneumonia" && "ring-2 ring-ring/45")}
                   onClick={() => setSelectedVerdict("Pneumonia")}
                 >
                   Pneumonia
@@ -116,7 +127,7 @@ export function ResultPanel({ result, onConfirmed }: ResultPanelProps) {
                 <Button
                   type="button"
                   variant={selectedVerdict === "Normal" ? "default" : "outline"}
-                  className={cn(selectedVerdict === "Normal" && "ring-2 ring-ring")}
+                  className={cn("justify-start", selectedVerdict === "Normal" && "ring-2 ring-ring/45")}
                   onClick={() => setSelectedVerdict("Normal")}
                 >
                   Normal
@@ -125,34 +136,35 @@ export function ResultPanel({ result, onConfirmed }: ResultPanelProps) {
               {selectedVerdict && selectedVerdict !== result.prediction && (
                 <div className="mt-2 flex items-center gap-1.5 text-sm text-warning">
                   <AlertTriangle className="size-3.5" />
-                  This overrides the model's prediction of {result.prediction}.
+                  This overrides the model prediction of {result.prediction}.
                 </div>
               )}
             </div>
 
-            <div className="grid gap-2">
-              <Label htmlFor="clinician-name">Clinician name (optional)</Label>
-              <Input
-                id="clinician-name"
-                value={clinicianName}
-                onChange={(e) => setClinicianName(e.target.value)}
-                placeholder="Dr. Jane Doe"
-              />
-            </div>
-
-            <div className="grid gap-2">
-              <Label htmlFor="notes">Notes (optional)</Label>
-              <Textarea
-                id="notes"
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder="Clinical context, follow-up plan, etc."
-              />
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="grid gap-2">
+                <Label htmlFor="clinician-name">Clinician name (optional)</Label>
+                <Input
+                  id="clinician-name"
+                  value={clinicianName}
+                  onChange={(e) => setClinicianName(e.target.value)}
+                  placeholder="Dr. Jane Doe"
+                />
+              </div>
+              <div className="grid gap-2 sm:col-span-2">
+                <Label htmlFor="notes">Notes (optional)</Label>
+                <Textarea
+                  id="notes"
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder="Clinical context, follow-up plan, or reason for override."
+                />
+              </div>
             </div>
 
             {error && <div className="text-sm text-destructive">{error}</div>}
 
-            <Button onClick={handleSubmit} disabled={!selectedVerdict || submitting}>
+            <Button className="sm:w-fit" onClick={handleSubmit} disabled={!selectedVerdict || submitting}>
               {submitting && <Loader2 className="size-4 animate-spin" />}
               Confirm final decision
             </Button>
