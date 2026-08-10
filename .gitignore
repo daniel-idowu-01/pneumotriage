@@ -1,0 +1,37 @@
+# --- Python / backend ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Model weights are large binaries and carry no PHI, but should be distributed
+# as a release artifact / Git LFS pointer, not a plain committed blob.
+backend/models/*.keras
+!backend/models/.gitkeep
+
+# --- Node / frontend ---
+node_modules/
+frontend/dist/
+frontend/.vite/
+
+# --- Env / secrets ---
+.env
+.env.*
+!.env.example
+
+# --- Uploaded images (audit trail lives in DB + object storage, not the repo) ---
+backend/uploads/
+backend/data/
+
+# --- OS / editor ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# --- Postgres data volume (if bind-mounted locally) ---
+pgdata/
