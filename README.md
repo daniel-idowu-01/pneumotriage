@@ -26,6 +26,11 @@ requirement — read it before deploying this anywhere near real patients.
    Only that clinician decision is treated as final.
 5. Every prediction and its eventual clinician disposition are recorded
    in an audit log, viewable and filterable in the History view.
+6. An `/admin` dashboard (password-gated — see below) aggregates that log
+   into usage stats: request volume over time, pneumonia rate, clinician
+   override rate, and per-clinician activity. Clinicians are still
+   identified by the free-text name they enter on confirm, not a login
+   account — see [docs/intended-use.md](docs/intended-use.md).
 
 ## Known limitations
 
@@ -65,7 +70,9 @@ docs/       Intended use, threshold rationale, human-in-the-loop policy
 cp .env.example .env
 ```
 
-Edit `.env` if you need non-default values. Never commit `.env`.
+Edit `.env` if you need non-default values. Never commit `.env`. In
+particular, change `ADMIN_PASSWORD` and `SECRET_KEY` before deploying
+anywhere beyond your own machine — they gate the `/admin` dashboard.
 
 ### 2. Model file
 

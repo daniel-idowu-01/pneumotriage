@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app import inference
 from app.config import get_settings
 from app.db import init_db
-from app.routers import health, history, predict
+from app.routers import admin, health, history, predict
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -43,3 +43,4 @@ app.add_middleware(
 app.include_router(health.router, tags=["health"])
 app.include_router(predict.router, tags=["prediction"])
 app.include_router(history.router, tags=["history"])
+app.include_router(admin.router)

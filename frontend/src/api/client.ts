@@ -1,4 +1,6 @@
+import { getAdminToken } from "@/api/adminAuth"
 import type {
+  AdminStatsResponse,
   ConfirmRequest,
   PredictionListResponse,
   PredictionRecord,
@@ -80,4 +82,31 @@ export function listPredictions(
   }
   const qs = query.toString()
   return apiFetch<PredictionListResponse>(`/predictions${qs ? `?${qs}` : ""}`)
+}
+
+export function adminLogin(password: string): Promise<{ token: string }> {
+  return apiFetch<{ token: string }>("/admin/login", {
+    method: "POST",
+    body: JSON.stringify({ password }),
+  })
+}
+
+export interface AdminStatsParams {
+  date_from?: string
+  date_to?: string
+}
+
+export function getAdminStats(params: AdminStatsParams = {}): Promise<AdminStatsResponse> {
+  const token = getAdminToken()
+  if (!token) return Promise.reject(new ApiError(401, "Not signed in"))
+
+  const query = new URLSearchParams()
+  for (const [key, value] of Object.entries(params)) {
+    if (value) query.set(key, value)
+  }
+  const qs = query.toString()
+
+  return apiFetch<AdminStatsResponse>(`/admin/stats${qs ? `?${qs}` : ""}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  })
 }

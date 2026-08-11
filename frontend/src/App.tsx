@@ -1,6 +1,7 @@
 import { NavLink, Route, Routes } from "react-router-dom"
-import { Activity, ClipboardList, History, Stethoscope } from "lucide-react"
+import { Activity, ClipboardList, History, LayoutDashboard, Stethoscope } from "lucide-react"
 
+import { AdminPage } from "@/pages/AdminPage"
 import { HistoryPage } from "@/pages/HistoryPage"
 import { UploadPage } from "@/pages/UploadPage"
 import { cn } from "@/lib/utils"
@@ -57,6 +58,7 @@ function App() {
           <nav className="flex w-full gap-1 sm:w-auto">
             <NavItem to="/" icon={Activity} label="New screening" />
             <NavItem to="/history" icon={History} label="History" />
+            <NavItem to="/admin" icon={LayoutDashboard} label="Admin" />
           </nav>
         </div>
       </header>
@@ -65,6 +67,7 @@ function App() {
         <Routes>
           <Route path="/" element={<UploadPage />} />
           <Route path="/history" element={<HistoryPage />} />
+          <Route path="/admin" element={<AdminPage />} />
         </Routes>
       </main>
 

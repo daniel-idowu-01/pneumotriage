@@ -65,6 +65,25 @@ and it should be revisited if the tool is adapted to a different workflow.
 - **No clinical validation trial.** The reported metrics come from a
   held-out split of the training dataset, not a prospective clinical study.
 
+## Clinician identity in the admin dashboard
+
+The `/admin` dashboard aggregates the audit log into usage stats (request
+volume, pneumonia rate, override rate, per-clinician activity). It
+deliberately does **not** introduce a user account system: clinicians are
+still identified by the free-text name they type when confirming a
+result, exactly as in the rest of the app. "Per-clinician" stats are
+therefore grouped by that typed name, not a verified identity — two
+clinicians who type their name differently ("Dr. Bello" vs "T. Bello")
+will appear as two rows. This was a deliberate scope call for the
+single-clinic pilot (see `backend/app/security.py`), not an oversight;
+if this dashboard needs to attribute activity to verified individuals,
+that requires real clinician accounts, not just a bigger admin feature.
+
+The dashboard itself sits behind a single shared admin password
+(`ADMIN_PASSWORD` / `SECRET_KEY` in `.env`), separate from the rest of
+the app, which remains unauthenticated. Change both before deploying
+anywhere beyond a trusted local network.
+
 ## Human-in-the-loop requirement
 
 Anyone deploying or extending this tool must preserve the following

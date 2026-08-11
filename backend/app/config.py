@@ -28,6 +28,14 @@ class Settings(BaseSettings):
     # -- CORS --
     cors_origins: list[str] = ["http://localhost:5173"]
 
+    # -- Admin --
+    # Gates the /admin/* API and the frontend admin dashboard. This is a
+    # single shared password, not a per-user account system — clinicians
+    # are still identified by the free-text name they enter on confirm.
+    # CHANGE BOTH in any non-local deployment.
+    admin_password: str = "changeme"
+    secret_key: str = "dev-secret-change-me"
+
 
 @lru_cache
 def get_settings() -> Settings:

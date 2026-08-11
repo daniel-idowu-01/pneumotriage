@@ -50,3 +50,44 @@ class PredictionListResponse(BaseModel):
 class HealthResponse(BaseModel):
     status: Literal["ok", "degraded"]
     model_loaded: bool
+
+
+class AdminLoginRequest(BaseModel):
+    password: str
+
+
+class AdminLoginResponse(BaseModel):
+    token: str
+
+
+class ClinicianStats(BaseModel):
+    clinician_name: str
+    total: int
+    overrides: int
+    pneumonia_count: int
+    normal_count: int
+    first_active: datetime
+    last_active: datetime
+
+
+class DailyStats(BaseModel):
+    date: str
+    pneumonia_count: int
+    normal_count: int
+    total: int
+
+
+class AdminTotals(BaseModel):
+    total_predictions: int
+    pending_review: int
+    confirmed: int
+    pneumonia_count: int
+    normal_count: int
+    override_count: int
+    override_rate: float
+
+
+class AdminStatsResponse(BaseModel):
+    totals: AdminTotals
+    by_clinician: list[ClinicianStats]
+    daily: list[DailyStats]
