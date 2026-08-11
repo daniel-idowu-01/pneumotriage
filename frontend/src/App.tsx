@@ -44,7 +44,7 @@ function App() {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-semibold tracking-tight">PneumoDesk</span>
+                <span className="font-semibold tracking-tight">PneumoTriage</span>
                 <span className="rounded-sm border border-primary/25 bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-primary">
                   Review
                 </span>
