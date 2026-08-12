@@ -131,6 +131,16 @@ cd frontend && npm run dev
 run it as a static build behind whatever the clinic already uses to serve
 web assets.)
 
+## Model Training & Evaluation
+
+The full training pipeline, including the Nigerian dataset evaluation and 
+combined-corpus retraining, is available as a Colab notebook:
+
+[Open in Google Colab](https://colab.research.google.com/drive/1o8G1Ehc-fAxHeygNUu4wvw6rUiorHZIS?usp=sharing)
+
+Note: requires your own Kaggle API credentials, set via Colab's Secrets 
+manager (see notebook for setup).
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md).
