@@ -40,7 +40,7 @@ def test_preprocess_image_bytes_rejects_empty():
         inference.preprocess_image_bytes(b"")
 
 
-@pytest.mark.skipif(not MODEL_AVAILABLE, reason="pneumonia_model.keras not present")
+@pytest.mark.skipif(not MODEL_AVAILABLE, reason=f"{MODEL_PATH} not present")
 def test_predict_applies_threshold_not_default_half():
     inference.load_inference_model()
     img = (np.random.rand(400, 400) * 255).astype("uint8")

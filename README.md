@@ -18,9 +18,12 @@ requirement — read it before deploying this anywhere near real patients.
    150x150, normalize) and runs it through a trained CNN.
 3. The model outputs P(Normal). Because missing a true pneumonia case in
    triage is far more costly than a false alarm, the decision threshold
-   is set to **0.8** instead of the default 0.5 (0.91 pneumonia recall /
-   0.92 pneumonia precision at that threshold) — anything the model isn't
-   confidently "Normal" about is flagged as Pneumonia for review.
+   is set to **0.2** instead of the default 0.5 — anything the model isn't
+   confidently "Normal" about is flagged as Pneumonia for review. This
+   threshold is specific to the current model
+   (`pneumonia_model.keras`, trained on a combined
+   Guangzhou + Nigerian corpus) and would need to be re-derived if the
+   model is retrained — see [docs/intended-use.md](docs/intended-use.md).
 4. The result — with a persistent "decision support only" notice — is
    shown to the clinician, who must explicitly confirm or override it.
    Only that clinician decision is treated as final.
@@ -34,12 +37,16 @@ requirement — read it before deploying this anywhere near real patients.
 
 ## Known limitations
 
-- **Training data provenance.** The model was trained on the public
+- **Training data provenance.** The model is trained on a combined corpus:
+  the public
   [Chest X-Ray Images (Pneumonia)](https://www.kaggle.com/datasets/paultimothymooney/chest-xray-pneumonia)
-  dataset (pediatric patients, Guangzhou, China) — **not** on X-rays from
-  Nigerian or broader African clinical populations. Do not assume the
-  reported precision/recall transfers to a different population without
-  local validation.
+  dataset (pediatric patients, Guangzhou, China) plus a Nigerian chest
+  X-ray dataset, trained together. This closes most of the generalization
+  gap the earlier Guangzhou-only model had on Nigerian X-rays, but is not
+  a substitute for local clinical validation at a new deployment site.
+- **The Nigerian training data is viral-pneumonia-only** — bacterial
+  pneumonia presentations haven't been separately validated. See
+  [docs/intended-use.md](docs/intended-use.md) for details.
 - Binary output only (Pneumonia vs. Normal) — no localization, severity
   grading, or detection of other pathology.
 - No prospective clinical validation trial has been run.
@@ -61,8 +68,9 @@ docs/       Intended use, threshold rationale, human-in-the-loop policy
 - Python 3.10+
 - Node.js 20+
 - Docker (for local PostgreSQL) or an existing PostgreSQL instance
-- The trained model file, `pneumonia_model.keras` (not included in this
-  repo — see [backend/models/README.md](backend/models/README.md))
+- The trained model file, `pneumonia_model.keras` (not
+  included in this repo — see
+  [backend/models/README.md](backend/models/README.md))
 
 ### 1. Environment variables
 
@@ -76,11 +84,12 @@ anywhere beyond your own machine — they gate the `/admin` dashboard.
 
 ### 2. Model file
 
-Place your trained model at `backend/models/pneumonia_model.keras`. The
-model must accept grayscale `(150, 150, 1)` input and output a single
-sigmoid value representing P(Normal) — see
-[docs/intended-use.md](docs/intended-use.md) for why the classification
-threshold is 0.8, not 0.5.
+Place your trained model at
+`backend/models/pneumonia_model.keras`. The model must accept
+grayscale `(150, 150, 1)` input and output a single sigmoid value
+representing P(Normal) — see [docs/intended-use.md](docs/intended-use.md)
+for why the classification threshold is 0.2, not 0.5 (and not the 0.8 an
+earlier single-dataset version of this model used).
 
 ### 3. Database
 

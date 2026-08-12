@@ -14,9 +14,14 @@ class Settings(BaseSettings):
     # -- Model --
     model_path: str = "models/pneumonia_model.keras"
     image_size: int = 150
-    # Threshold tuned to maximize pneumonia recall (0.91 recall / 0.92
-    # precision at 0.8) rather than the default 0.5 — see docs/intended-use.md.
-    classification_threshold: float = 0.8
+    # Threshold is a property of THIS trained model, not a fixed constant.
+    # pneumonia_model_combined_v2 was retrained on a combined corpus (original
+    # Guangzhou dataset + Nigerian dataset, trained together) and its sigmoid
+    # output is calibrated differently than the earlier single-dataset model,
+    # which used 0.8. If the model is retrained again, this value must be
+    # re-derived against the new model's precision/recall curve, not copied
+    # forward — see docs/intended-use.md.
+    classification_threshold: float = 0.2
 
     # -- Database --
     database_url: str = "postgresql+psycopg://pneumonia:pneumonia@localhost:5432/pneumonia"

@@ -22,38 +22,83 @@ document:
 - The audit log records the model's prediction and the clinician's final
   call as separate fields, so the two are never conflated after the fact.
 
-## Why the threshold is 0.8, not 0.5
+## Model version: combined-trained, not single-dataset
 
-The model outputs a single sigmoid value representing P(Normal). A naive
-classifier would threshold at 0.5. This tool uses **0.8** instead:
+The production model file is `pneumonia_model.keras` — as of this version,
+that filename refers to the **combined-trained** model (previously it
+referred to the older Guangzhou-only model; the filename was not changed
+across this retrain, only its contents). It was **trained on one combined
+corpus**: the original Guangzhou-sourced dataset plus a Nigerian chest
+X-ray dataset, trained together in a single pass — not sequential
+fine-tuning of the Guangzhou-only model on Nigerian data afterward.
 
-| Threshold | Pneumonia recall | Pneumonia precision |
-|-----------|-------------------|----------------------|
-| 0.8       | 0.91              | 0.92                 |
+This retraining happened because an earlier version of this tool used a
+model trained only on the Guangzhou dataset (see "Training data
+provenance" below). That model had high pneumonia recall on its own
+held-out test split, but when evaluated against Nigerian normal X-rays it
+produced a high false-positive rate — it too often flagged genuinely
+normal Nigerian films as Pneumonia, consistent with the general risk that
+a model trained on one population's imaging equipment and patient profile
+doesn't generalize cleanly to another. Combining both datasets into one
+training corpus closed most of this gap, rather than trying to patch it
+with threshold tuning alone.
 
-Raising the threshold for "Normal" means the model only calls an X-ray
-Normal when it is quite confident — anything more ambiguous is flagged as
-Pneumonia instead. This deliberately trades some false-positive Pneumonia
-flags for fewer missed true Pneumonia cases, because in a triage context a
-missed pneumonia case is far more costly than a false alarm that a
-clinician reviews and clears. This is a threshold choice made for a
-specific clinical workflow (triage prioritization with mandatory clinician
-review) — it is not a claim that 0.8 is a universally "better" threshold,
+## Why the threshold is 0.2, not 0.8
+
+The model outputs a single sigmoid value representing P(Normal); a naive
+classifier would threshold at 0.5. **The threshold is a property of the
+specific trained model, not a fixed constant of the problem.** An earlier
+version of this tool used the previous, Guangzhou-only model (also
+distributed as `pneumonia_model.keras`, before the combined retrain
+replaced its contents) at a threshold of **0.8**. The current
+combined-trained model has a different score calibration, and requires a
+**much lower** threshold of **0.2** to hit an equivalent operating point.
+Do not carry a threshold value forward across a model swap — if this model
+is retrained again (more data, a different architecture, even the same
+data reshuffled), the threshold must be re-derived from that new model's
+own precision/recall curve, not copied from this section.
+
+> **TODO before this document is considered current:** fill in this
+> model's actual precision/recall at 0.2 from its held-out evaluation, the
+> way the previous version of this document did for the 0.8 model. This
+> section currently states the threshold _value_ and _why it differs_ but
+> does not yet carry verified performance numbers for the current
+> combined-trained model — don't deploy on the strength of this doc alone
+> until that's filled in.
+
+As before, the qualitative reasoning for biasing away from 0.5 is
+unchanged: in a triage context a missed pneumonia case is far more costly
+than a false alarm a clinician reviews and clears, so the operating point
+is deliberately chosen to favor pneumonia recall over precision. This is a
+choice made for a specific clinical workflow (triage prioritization with
+mandatory clinician review), not a claim that 0.2 is universally "better,"
 and it should be revisited if the tool is adapted to a different workflow.
 
 ## Known limitations
 
-- **Training data provenance.** The model was trained on the public
+- **Training data provenance.** The model was trained on a combined
+  corpus: the public
   [Chest X-Ray Images (Pneumonia)](https://www.kaggle.com/datasets/paultimothymooney/chest-xray-pneumonia)
-  dataset, which was collected from a pediatric population in Guangzhou,
-  China. It was **not** trained or validated on X-rays from Nigerian or
-  broader African clinical populations. Differences in imaging equipment,
+  dataset (pediatric population, Guangzhou, China) plus a Nigerian chest
+  X-ray dataset, trained together. This is an improvement over the earlier
+  Guangzhou-only model (see above), but "trained on some Nigerian data" is
+  not the same as "clinically validated across Nigerian and broader
+  African clinical populations." Differences in imaging equipment,
   patient demographics, comorbidity patterns (e.g. malnutrition, HIV,
-  sickle cell disease), and disease prevalence between the training
-  population and a deployment population can degrade real-world accuracy
-  in ways that a held-out test split from the same source dataset cannot
-  reveal. Do not treat the reported precision/recall numbers as a
-  guarantee of performance on a new population.
+  sickle cell disease), and disease prevalence between the training data
+  and a specific deployment site can still degrade real-world accuracy in
+  ways a held-out test split cannot fully reveal. Do not treat reported
+  precision/recall numbers as a guarantee of performance at a new site.
+- **Nigerian training data is viral-pneumonia-only.** The Nigerian dataset
+  used in the combined training labels its positive class specifically as
+  "viral pneumonia." The model's performance on **bacterial** pneumonia
+  presentations has not been separately validated against Nigerian data —
+  the Nigerian contribution to the combined corpus does not confirm the
+  model generalizes equally well to bacterial cases, only viral ones. This
+  matters clinically since bacterial and viral pediatric pneumonia can
+  differ in radiographic presentation. Treat any "Pneumonia" flag as
+  etiology-agnostic and requiring full clinical correlation, not just
+  radiographic confirmation.
 - **Binary output only.** The model distinguishes Pneumonia vs. Normal. It
   does not localize findings, grade severity, distinguish bacterial from
   viral pneumonia, or detect other pathology (e.g. tuberculosis, effusion,
