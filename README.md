@@ -131,7 +131,7 @@ cd frontend && npm run dev
 run it as a static build behind whatever the clinic already uses to serve
 web assets.)
 
-## Model Training & Evaluation
+### Model Training & Evaluation
 
 The full training pipeline, including the Nigerian dataset evaluation and 
 combined-corpus retraining, is available as a Colab notebook:
