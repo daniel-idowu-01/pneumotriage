@@ -1,3 +1,5 @@
+[![Read on Hashnode](https://img.shields.io/badge/Hashnode-Read%20the%20Blog-2962FF?style=for-the-badge&logo=hashnode&logoColor=white)](https://the-neural-notebook.hashnode.dev/does-an-ai-that-reads-chest-x-rays-still-work-on-x-rays-from-a-different-country-i-tested-it-with-nigerian-data)
+
 # Pneumonia Screening - Decision Support
 
 An open-source clinical decision-support tool that screens pediatric chest
@@ -10,8 +12,6 @@ suggestion that a clinician must review and confirm before it counts as a
 final result. See [docs/intended-use.md](docs/intended-use.md) for the
 full reasoning behind the threshold choice and the human-in-the-loop
 requirement - read it before deploying this anywhere near real patients.
-
-[![Read on Hashnode](https://img.shields.io/badge/Hashnode-Read%20the%20Blog-2962FF?style=for-the-badge&logo=hashnode&logoColor=white)](https://the-neural-notebook.hashnode.dev/does-an-ai-that-reads-chest-x-rays-still-work-on-x-rays-from-a-different-country-i-tested-it-with-nigerian-data)
 
 ## How it works
 
