@@ -11,6 +11,8 @@ final result. See [docs/intended-use.md](docs/intended-use.md) for the
 full reasoning behind the threshold choice and the human-in-the-loop
 requirement - read it before deploying this anywhere near real patients.
 
+[![Read on Hashnode](https://img.shields.io/badge/Hashnode-Read%20the%20Blog-2962FF?style=for-the-badge&logo=hashnode&logoColor=white)](https://the-neural-notebook.hashnode.dev/does-an-ai-that-reads-chest-x-rays-still-work-on-x-rays-from-a-different-country-i-tested-it-with-nigerian-data)
+
 ## How it works
 
 1. A clinician uploads a chest X-ray (JPEG/PNG) through the web UI.
